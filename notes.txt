@@ -1,0 +1,35 @@
+npm init playwright@latest
+npx playwright test --headed
+npx playwright show-report
+
+npx playwright test <name of .spec.js file> --project=chromium (headless)
+npx playwright test <name of .spec.js file> --project=chromium --headed
+npx playwright test <name of .spec.js file> --project=chromium --headed --debug (debug mode)
+-----------------------------------------------------------------------------------------------
+const {test, expect} = require('@playwright/test')
+
+test("home page test", async({page}) => {})
+
+async has to be used because in JS activities are not done just one after the other by default. So using async we can make sure that second activity is processed only after first one is done.
+
+await page.goto('');
+await page.title();
+await page.close();
+
+await page.locator('').click();
+await page.click('');
+
+await page.fill('locator', 'value')
+await page.type('locator', 'value')
+
+multiple element: const Elements = await page.$$('')
+
+
+assertions:
+await expect(page).toHaveTitle('')
+await expect(page).toHaveURL('')
+await expect(locator).toBeVisible();
+
+
+
+
