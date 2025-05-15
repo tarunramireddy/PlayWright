@@ -21,6 +21,7 @@ await page.click('');
 
 await page.fill('locator', 'value')
 await page.type('locator', 'value')
+await ele.textContent()
 
 multiple element: const Elements = await page.$$('')
 
@@ -30,6 +31,24 @@ await expect(page).toHaveTitle('')
 await expect(page).toHaveURL('')
 await expect(locator).toBeVisible();
 
+
+-------------------------- specific locators -----------------------
+page.getByRole() to locate by explicit and implicit accessibility attributes.
+page.getByText() to locate by text content.
+page.getByLabel() to locate a form control by associated label's text.
+page.getByPlaceholder() to locate an input by placeholder.
+page.getByAltText() to locate an element, usually image, by its text alternative.
+page.getByTitle() to locate an element by its title attribute.
+page.getByTestId() to locate an element based on its data-testid attribute
+
+------------------------------------------------------------------------
+
+Playwright CodeGen Automatically record and generate the test scripts by following what exactly we are doing on browser - npx playwright codegen
+To create new file and copy code from codegen into that file: npx playwright codegen -o tests/mytest.spec.js
+For browser specific codegen inpsector : npx playwright codegen -b chromium
+Language specific : npx playwright codegen -target javascript
+For any particular emulator : npx playwright codegen --device "iPhone X"
+For specific viewPort Size: npx playwright codegen --viewport-size "720,720"
 
 
 
