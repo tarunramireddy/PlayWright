@@ -43,3 +43,15 @@ test("Assertions", async({page})=>{
 
 
 // for negative matches use expect(page).not.toBeChecked(); likewise for all others
+
+/* Diff b/w soft assert and hard assert */
+
+/*
+    Hard assert terminates the test if assertion goes false 
+    [Example of hard assert: await expect(page.locator('')).toBeVisible();]
+*/
+
+/* 
+    Soft assert never terminates even though if assertion goes false
+    [Example of soft assert: await expect.soft(page.locator('')).toBeVisible();] 
+*/
