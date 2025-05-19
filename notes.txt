@@ -10,7 +10,8 @@ const {test, expect} = require('@playwright/test')
 
 test("home page test", async({page}) => {})
 
-async has to be used because in JS activities are not done just one after the other by default. So using async we can make sure that second activity is processed only after first one is done.
+async has to be used because in JS activities are not done just one after the other by default. 
+So using async we can make sure that second activity is processed only after first one is done.
 
 await page.goto('');
 await page.title();
@@ -25,14 +26,30 @@ await ele.textContent()
 
 multiple element: const Elements = await page.$$('')
 
+--------------------------------------------------------------------------------------
+Assertions:
+https://playwright.dev/docs/test-assertions
 
-assertions:
-await expect(page).toHaveTitle('')
-await expect(page).toHaveURL('')
-await expect(locator).toBeVisible();
+Hard assertions: (If some assertion gets failed it never executes the remaining steps)
+1) expect(page).toHaveURL()                     Page has URL
+2) expect(page).toHaveTitle()                   Page has title
+3) expect(locator).toBeVisible()                Element is visible
+4) expect(locator).toBeEnabled()                Control is enabled
+   expect(locator).toBeDisabled()               Element is disabled
+5) expect(locator).toBeChecked()                Radio/Checkbox is checked
+6) expect(locator).toHaveAttribute('att','value')            Element has attribute
+7) expect(locator).toHaveText()                 Element matches text
+8) expect(locator).toContainText()              Element contains text
+9) expect(locator).toHaveValue(value)           Input has a value
+10) expect(locator).toHaveCount()               List of elements has given length
+
+if you want to assert with not use like: expect(page).not.toHaveURL()
+
+Soft assertions: (This doesn't skip the remaining steps if some assertion gets failed)
+We can just add expect.soft(page).toHaveURL(); or expect.soft(page.locator('.q')).toBeVisible();
 
 
--------------------------- specific locators -----------------------
+-------------------------- specific locators --------------------------------------------
 page.getByRole() to locate by explicit and implicit accessibility attributes.
 page.getByText() to locate by text content.
 page.getByLabel() to locate a form control by associated label's text.
@@ -41,7 +58,8 @@ page.getByAltText() to locate an element, usually image, by its text alternative
 page.getByTitle() to locate an element by its title attribute.
 page.getByTestId() to locate an element based on its data-testid attribute
 
-------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+Codegen:
 
 Playwright CodeGen Automatically record and generate the test scripts by following what exactly we are doing on browser - npx playwright codegen
 To create new file and copy code from codegen into that file: npx playwright codegen -o tests/mytest.spec.js
@@ -49,6 +67,8 @@ For browser specific codegen inpsector : npx playwright codegen -b chromium
 Language specific : npx playwright codegen -target javascript
 For any particular emulator : npx playwright codegen --device "iPhone X"
 For specific viewPort Size: npx playwright codegen --viewport-size "720,720"
+
+---------------------------------------------------------------------------------------
 
 
 
