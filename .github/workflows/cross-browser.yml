@@ -39,6 +39,11 @@ jobs:
         cp .env.example .env
         echo "ENV=staging" >> .env
         echo "CI=true" >> .env
+        # Add login credentials from secrets
+        echo "TEST_USER_EMAIL=${{ secrets.TEST_USER_EMAIL }}" >> .env
+        echo "TEST_USER_PASSWORD=${{ secrets.TEST_USER_PASSWORD }}" >> .env
+        echo "STAGING_USERNAME=${{ secrets.STAGING_USERNAME }}" >> .env
+        echo "STAGING_PASSWORD=${{ secrets.STAGING_PASSWORD }}" >> .env
 
     - name: Run cross-browser tests
       run: |

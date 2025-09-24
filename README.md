@@ -10,10 +10,12 @@ A comprehensive, modular, and reusable Playwright automation framework built wit
 - **Custom Fixtures**: Reusable test fixtures for common setup/teardown operations
 - **Comprehensive Reporting**: Allure reports, HTML reports, and JUnit XML output
 - **CI/CD Ready**: GitHub Actions workflows for automated testing
-- **Utility Classes**: Common helpers for waits, logging, and test data generation
-- **Authentication Management**: Automated login and session management
-- **Cross-Browser Testing**: Support for Chrome, Firefox, and Safari
+- **Utility Classes**: Common helpers for waits, logging, locators, and test data generation
+- **Flexible Locator Strategies**: Support for CSS, XPath, text-based, role-based, and test-id locators
+- **Authentication Management**: Automated login and session management with environment credentials
+- **Cross-Browser Testing**: Support for Chrome, Firefox, Safari, and mobile browsers
 - **Parallel Execution**: Fast test execution with parallel processing
+- **Winston Logging**: Structured logging with step-by-step execution tracking
 
 ## 📁 Project Structure
 
@@ -39,8 +41,9 @@ A comprehensive, modular, and reusable Playwright automation framework built wit
 │   │   ├── home.spec.ts         # Home page tests
 │   │   └── smoke.spec.ts        # Smoke tests
 │   └── utils/             # Utility classes
-│       ├── logger.ts            # Logging utility
+│       ├── logger.ts            # Winston logging utility
 │       ├── wait.utils.ts        # Wait helpers
+│       ├── locator.helper.ts    # Locator strategy helpers
 │       ├── data.generator.ts    # Test data generation
 │       ├── allure.reporter.ts   # Allure reporting helpers
 │       └── index.ts             # Utility exports
@@ -83,6 +86,17 @@ A comprehensive, modular, and reusable Playwright automation framework built wit
    ```bash
    cp .env.example .env
    # Edit .env file with your environment-specific values
+   ```
+
+5. **Configure GitHub Secrets (for CI/CD):**
+   ```bash
+   # See docs/SECRETS_SETUP.md for detailed instructions
+   # Add these secrets to your GitHub repository:
+   # - TEST_USER_EMAIL
+   # - TEST_USER_PASSWORD  
+   # - DEV_USERNAME, DEV_PASSWORD
+   # - STAGING_USERNAME, STAGING_PASSWORD
+   # - PROD_USERNAME, PROD_PASSWORD
    ```
 
 ## 🔧 Configuration
@@ -157,6 +171,8 @@ npm run test:env:prod
 npx playwright test --project=chromium
 npx playwright test --project=firefox
 npx playwright test --project=webkit
+npx playwright test --project="Mobile Chrome"
+npx playwright test --project="Mobile Safari"
 ```
 
 ### Test Filtering
@@ -266,12 +282,29 @@ await waitUtils.waitForText('Expected text');
 ```
 
 ### Data Generator
+### Data Generator
+
 ```typescript
 import { DataGenerator } from '@utils/data.generator';
 
 const user = DataGenerator.generateUser();
 const email = DataGenerator.generateEmail();
 const testId = DataGenerator.generateTestId('user');
+```
+
+### Locator Helpers
+
+```typescript
+import { LocatorHelper } from '@utils/locator.helper';
+
+// Different locator strategies
+await LocatorHelper.css(page, '#email').fill('test@example.com');
+await LocatorHelper.xpath(page, '//button[text()="Login"]').click();
+await LocatorHelper.text(page, 'Welcome to Dashboard').waitFor();
+await LocatorHelper.testId(page, 'submit-btn').click();
+await LocatorHelper.role(page, 'button', { name: 'Save' }).click();
+await LocatorHelper.placeholder(page, 'Enter your password').fill('pass123');
+await LocatorHelper.label(page, 'Email Address').fill('user@test.com');
 ```
 
 ## 🔐 Authentication
