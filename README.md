@@ -63,40 +63,84 @@ A comprehensive, modular, and reusable Playwright automation framework built wit
 
 - Node.js (version 18 or higher)
 - npm or yarn package manager
+- Java (for Allure reports) - Optional but recommended
 
-### Setup
+### Quick Setup (Recommended)
 
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
-   cd playwright-automation-framework
+   git clone https://github.com/tarunramireddy/PlayWright.git
+   cd PlayWright
    ```
 
-2. **Install dependencies:**
+2. **Run the automated setup:**
    ```bash
+   # Option 1: Use the setup script (recommended)
+   bash setup.sh
+   
+   # Option 2: Use npm script
+   npm install && npm run setup
+   ```
+
+3. **Configure your environment:**
+   ```bash
+   # Edit the .env file with your actual credentials
+   nano .env  # or use your preferred editor
+   ```
+
+### Manual Setup (Alternative)
+
+If you prefer manual setup:
+
+1. **Clone and install:**
+   ```bash
+   git clone https://github.com/tarunramireddy/PlayWright.git
+   cd PlayWright
    npm install
    ```
 
-3. **Install Playwright browsers:**
+2. **Install Playwright browsers:**
    ```bash
    npm run install:browsers
    ```
 
-4. **Setup environment variables:**
+3. **Create environment file:**
    ```bash
-   cp .env.example .env
-   # Edit .env file with your environment-specific values
+   npm run env:create
+   # Then edit .env with your credentials
    ```
 
-5. **Configure GitHub Secrets (for CI/CD):**
+### Environment File Setup
+
+The `.env` file is **not included** in the repository for security reasons. You need to:
+
+1. **Create from template:**
    ```bash
-   # See docs/SECRETS_SETUP.md for detailed instructions
-   # Add these secrets to your GitHub repository:
-   # - TEST_USER_EMAIL
-   # - TEST_USER_PASSWORD  
-   # - DEV_USERNAME, DEV_PASSWORD
-   # - STAGING_USERNAME, STAGING_PASSWORD
-   # - PROD_USERNAME, PROD_PASSWORD
+   cp .env.example .env
+   ```
+
+2. **Edit with your values:**
+   ```bash
+   # Required for testing
+   TEST_USER_EMAIL=your-email@example.com
+   TEST_USER_PASSWORD=your-password
+   
+   # Environment selection
+   ENV=dev
+   ```
+
+3. **Available environment variables:**
+   ```bash
+   # Test Configuration
+   ENV=dev                          # Environment: dev/staging/prod
+   TEST_USER_EMAIL=test@example.com # Test user email
+   TEST_USER_PASSWORD=password123   # Test user password
+   
+   # Environment-specific credentials
+   DEV_USERNAME=dev-user@company.com
+   DEV_PASSWORD=dev-password
+   STAGING_USERNAME=staging-user@company.com
+   STAGING_PASSWORD=staging-password
    ```
 
 ## 🔧 Configuration

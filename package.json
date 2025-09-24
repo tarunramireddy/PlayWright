@@ -16,6 +16,8 @@
     "allure-commandline": "^2.25.0"
   },
   "scripts": {
+    "setup": "bash setup.sh",
+    "postinstall": "npx playwright install --with-deps",
     "test": "npx playwright test",
     "test:headed": "npx playwright test --headed",
     "test:debug": "npx playwright test --debug",
@@ -25,6 +27,7 @@
     "test:env:prod": "ENV=prod npx playwright test",
     "report:html": "npx playwright show-report",
     "report:allure": "allure serve allure-results",
-    "install:browsers": "npx playwright install"
+    "install:browsers": "npx playwright install",
+    "env:create": "cp .env.example .env && echo '.env file created! Please edit with your credentials.'"
   }
 }
