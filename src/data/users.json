@@ -1,0 +1,44 @@
+{
+  "validUsers": [
+    {
+      "id": "user001",
+      "email": "test.user@example.com",
+      "firstName": "Test",
+      "lastName": "User",
+      "role": "user",
+      "active": true
+    },
+    {
+      "id": "admin001", 
+      "email": "admin@example.com",
+      "firstName": "Admin",
+      "lastName": "User",
+      "role": "admin",
+      "active": true
+    }
+  ],
+  "invalidUsers": [
+    {
+      "id": "invalid001",
+      "email": "invalid@example.com",
+      "firstName": "Invalid",
+      "lastName": "User",
+      "role": "user",
+      "active": false
+    }
+  ],
+  "testCredentials": {
+    "validUser": {
+      "email": "test@example.com",
+      "password": "Test123!@#"
+    },
+    "invalidUser": {
+      "email": "invalid@example.com", 
+      "password": "wrongpassword"
+    },
+    "adminUser": {
+      "email": "admin@example.com",
+      "password": "Admin123!@#"
+    }
+  }
+}

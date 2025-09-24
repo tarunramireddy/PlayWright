@@ -1,0 +1,30 @@
+{
+  "name": "playwright-automation-framework",
+  "version": "1.0.0",
+  "description": "A modular and reusable Playwright automation framework using TypeScript",
+  "dependencies": {
+    "playwright": "^1.55.1",
+    "dotenv": "^16.4.5",
+    "winston": "^3.11.0",
+    "allure-playwright": "^3.0.0",
+    "@faker-js/faker": "^9.0.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.1",
+    "@types/node": "^24.5.2",
+    "typescript": "^5.3.3",
+    "allure-commandline": "^2.25.0"
+  },
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "test:ui": "npx playwright test --ui",
+    "test:env:dev": "ENV=dev npx playwright test",
+    "test:env:staging": "ENV=staging npx playwright test",
+    "test:env:prod": "ENV=prod npx playwright test",
+    "report:html": "npx playwright show-report",
+    "report:allure": "allure serve allure-results",
+    "install:browsers": "npx playwright install"
+  }
+}

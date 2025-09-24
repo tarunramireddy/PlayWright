@@ -1,0 +1,26 @@
+{
+  "resultsDir": "allure-results",
+  "reportDir": "allure-report",
+  "links": {
+    "issue": {
+      "pattern": "https://github.com/your-org/your-repo/issues/{}",
+      "name": "Issue {}"
+    },
+    "tms": {
+      "pattern": "https://your-tms.com/test/{}",
+      "name": "Test Case {}"
+    }
+  },
+  "categories": [
+    {
+      "name": "Product Bugs",
+      "matchedStatuses": ["failed"],
+      "messageRegex": ".*AssertionError.*"
+    },
+    {
+      "name": "Test Infrastructure Issues",
+      "matchedStatuses": ["failed"],
+      "messageRegex": ".*TimeoutError.*|.*NetworkError.*"
+    }
+  ]
+}

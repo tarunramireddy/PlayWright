@@ -1,0 +1,58 @@
+name: Cross-Browser Testing
+
+on:
+  schedule:
+    # Run cross-browser tests weekly on Sundays at 1 AM UTC
+    - cron: '0 1 * * 0'
+  workflow_dispatch:
+
+jobs:
+  cross-browser-test:
+    timeout-minutes: 120
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+        viewport: 
+          - { width: 1920, height: 1080, name: "desktop" }
+          - { width: 768, height: 1024, name: "tablet" }
+          - { width: 375, height: 667, name: "mobile" }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
+
+    - name: Setup environment
+      run: |
+        cp .env.example .env
+        echo "ENV=staging" >> .env
+        echo "CI=true" >> .env
+
+    - name: Run cross-browser tests
+      run: |
+        npx playwright test --project=${{ matrix.browser }} --grep="@smoke" \
+          --reporter=html,allure-playwright,junit \
+          --output-dir=test-results-${{ matrix.browser }}-${{ matrix.viewport.name }}
+      env:
+        VIEWPORT_WIDTH: ${{ matrix.viewport.width }}
+        VIEWPORT_HEIGHT: ${{ matrix.viewport.height }}
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: cross-browser-results-${{ matrix.browser }}-${{ matrix.viewport.name }}
+        path: test-results-${{ matrix.browser }}-${{ matrix.viewport.name }}/
+        retention-days: 14
