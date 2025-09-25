@@ -1,15 +1,19 @@
 import { Page, Locator } from "@playwright/test";
 import { BasePage } from "./base.page";
 import { logger } from "../utils/logger";
+import { getUser, UserType } from "../utils/user.manager";
+import * as loc from "../utils/locator.helper";
 
 export class HomePage extends BasePage {
-  private readonly header: Locator;
-  private readonly mainContent: Locator;
+  private readonly allianceDashboard: Locator;
+  private readonly leaDashboard: Locator;
+  private readonly superadminDashboard: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.header = this.locator('[data-testid="header"]');
-    this.mainContent = this.locator('[data-testid="main-content"]');
+    this.allianceDashboard = loc.xpath(page, "//*[text()='Alliance Dashboard']");
+    this.leaDashboard = loc.xpath(page, "//*[text()='School District Dashboard']");
+    this.superadminDashboard = loc.xpath(page, "//*[text()='Super Admin Dashboard']");
   }
 
   getUrl(): string {
@@ -18,18 +22,37 @@ export class HomePage extends BasePage {
 
   async isLoaded(): Promise<boolean> {
     try {
-      await this.verifyElementVisible(this.header);
-      await this.verifyElementVisible(this.mainContent);
+      await Promise.race([
+        this.verifyElementVisible(this.allianceDashboard),
+        this.verifyElementVisible(this.leaDashboard),
+        this.verifyElementVisible(this.superadminDashboard)
+      ]);
       return true;
     } catch {
       return false;
     }
   }
 
-  async waitForPageToLoad(): Promise<void> {
-    logger.step("Waiting for home page to fully load");
-    await this.waitForPageLoad();
-    await this.waitForElement(this.header);
-    await this.waitForElement(this.mainContent);
+  async verifyLoginCheck(userType: UserType): Promise<void> {
+    const user = getUser(userType);
+    logger.step(`Verifying dashboard for ${userType}: ${user.email}`);
+    
+    switch (userType) {
+      case 'superAdmin':
+        await this.verifyElementVisible(this.superadminDashboard);
+        logger.info('Super Admin Dashboard verified');
+        break;
+      case 'allianceAdmin':
+        await this.verifyElementVisible(this.allianceDashboard);
+        logger.info('Alliance Dashboard verified');
+        break;
+      case 'leaAdmin':
+        await this.verifyElementVisible(this.leaDashboard);
+        logger.info('LEA Dashboard verified');
+        break;
+      default:
+        throw new Error(`Unknown user type: ${userType}`);
+    }
   }
 }
+

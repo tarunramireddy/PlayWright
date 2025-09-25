@@ -9,6 +9,7 @@ export class LoginPage extends BasePage {
   private readonly loginButton: Locator;
   private readonly forgotPasswordLink: Locator;
   private readonly loginWithSystem: Locator;
+  private readonly errorMessage: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -26,6 +27,7 @@ export class LoginPage extends BasePage {
       page,
       '//a[contains(text(), "Forgot")]'
     );
+    this.errorMessage = loc.text(page,"Incorrect email address or password");
   }
 
   getUrl(): string {
@@ -39,6 +41,19 @@ export class LoginPage extends BasePage {
     } catch {
       return false;
     }
+  }
+
+   async clickLoginWithSystem(): Promise<void> {
+    logger.step("Clicking login with system");
+    await this.click(this.loginWithSystem);
+  }
+
+  async verifyLoginFormElements(): Promise<void> {
+    logger.step("Verifying login form elements");
+    await this.verifyElementVisible(this.emailInput);
+    await this.verifyElementVisible(this.passwordInput);
+    await this.verifyElementVisible(this.loginButton);
+    await this.verifyElementVisible(this.forgotPasswordLink);
   }
 
   async enterEmail(email: string): Promise<void> {
@@ -56,28 +71,22 @@ export class LoginPage extends BasePage {
     await this.click(this.loginButton);
   }
 
-  async clickForgotPassword(): Promise<void> {
-    logger.step("Clicking forgot password link");
-    await this.click(this.forgotPasswordLink);
-  }
-
-  async clickLoginWithSystem(): Promise<void> {
-    logger.step("Clicking login with system");
-    await this.click(this.loginWithSystem);
-  }
-
-  async verifyLoginFormElements(): Promise<void> {
-    logger.step("Verifying login form elements");
-    await this.verifyElementVisible(this.emailInput);
-    await this.verifyElementVisible(this.passwordInput);
-    await this.verifyElementVisible(this.loginButton);
-    await this.verifyElementVisible(this.forgotPasswordLink);
-  }
   async login(email: string, password: string): Promise<void> {
     await this.enterEmail(email);
     await this.enterPassword(password);
     await this.clickLoginButton();
   }
+
+  async verifyErrorMessage(): Promise<void> {
+    logger.step("Verifying error message");
+    await this.verifyElementVisible(this.errorMessage);
+  }
+
+  async clickForgotPassword(): Promise<void> {
+    logger.step("Clicking forgot password link");
+    await this.click(this.forgotPasswordLink);
+  }
+
   async clearForm(): Promise<void> {
     logger.step("Clearing login form");
     await this.fill(this.emailInput, "");

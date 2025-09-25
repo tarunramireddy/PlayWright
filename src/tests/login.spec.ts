@@ -51,14 +51,7 @@ test.describe("Login Tests", () => {
 
     await AllureReporter.step("Verify successful login", async () => {
       await loginPage.waitForPageLoad();
-
-      console.log("✅ Login process completed successfully");
-      console.log("✅ Using test email:", testUser.email);
-      console.log(
-        "✅ Framework successfully demonstrated all locator strategies"
-      );
-
-      expect(true).toBe(true);
+      await homePage.verifyLoginCheck("allianceAdmin");
     });
   });
 
@@ -94,6 +87,7 @@ test.describe("Login Tests", () => {
       async () => {
         await loginPage.clickLoginWithSystem();
         await loginPage.login(invalidUser.email, invalidUser.password);
+        await loginPage.verifyErrorMessage();
       }
     );
   });

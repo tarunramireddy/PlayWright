@@ -5,16 +5,22 @@ import { credentialsManager } from './src/config/config.manager';
 const config = credentialsManager.getPlaywrightConfig();
 const isCi = credentialsManager.isCi();
 
-const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5); 
+// Generate timestamp for every test run
+const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
 const branch = process.env.CI ? (process.env.GITHUB_REF_NAME || 'unknown') : 'local';
-const reportSuffix = process.env.ARCHIVE_REPORTS === 'true' ? `/${timestamp}_${branch}` : '';
+const testRunId = `${timestamp}_${branch}`;
 
+// Always use timestamped directories for better organization
 const baseResultsDir = 'test-results';
-const htmlReportDir = `${baseResultsDir}/html${reportSuffix}`;
-const allureResultsDir = `${baseResultsDir}/allure${reportSuffix}`;
-const testResultsDir = `${baseResultsDir}/output${reportSuffix}`;
+const htmlReportDir = `${baseResultsDir}/html/${testRunId}`;
+const allureResultsDir = `${baseResultsDir}/allure-results/${testRunId}`;
+const testResultsDir = `${baseResultsDir}/output/${testRunId}`;
 const junitFile = `${testResultsDir}/junit.xml`;
 const jsonFile = `${testResultsDir}/results.json`;
+
+// Create latest symlinks for easy access
+const latestHtmlDir = `${baseResultsDir}/html/latest`;
+const latestAllureDir = `${baseResultsDir}/allure-results/latest`;
 
 export default defineConfig({
   testDir: './src/tests',
@@ -37,10 +43,24 @@ export default defineConfig({
 
   
   reporter: [
-    ['html', { outputFolder: htmlReportDir, open: 'never' }],
-    ['allure-playwright', { outputFolder: allureResultsDir }],
+    ['html', { 
+      outputFolder: htmlReportDir, 
+      open: 'never'
+    }],
+    ['allure-playwright', { 
+      outputFolder: allureResultsDir,
+      detail: true,
+      suiteTitle: `Test Run ${testRunId}`
+    }],
     ['junit', { outputFile: junitFile }],
     ['json', { outputFile: jsonFile }],
+    ['./src/utils/custom-reporter.ts', { 
+      htmlReportDir, 
+      allureResultsDir, 
+      testRunId,
+      latestHtmlDir,
+      latestAllureDir 
+    }],
     ...(isCi ? [['github'] as [string]] : [['list'] as [string]])
   ],
 
@@ -84,32 +104,32 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
       },
     },
-    {
-      name: 'firefox',
-      use: { 
-        ...devices['Desktop Firefox'],
-      },
-    },
-    {
-      name: 'webkit',
-      use: { 
-        ...devices['Desktop Safari'],
-      },
-    },
+    // {
+    //   name: 'firefox',
+    //   use: { 
+    //     ...devices['Desktop Firefox'],
+    //   },
+    // },
+    // {
+    //   name: 'webkit',
+    //   use: { 
+    //     ...devices['Desktop Safari'],
+    //   },
+    // },
 
     
-    {
-      name: 'Mobile Chrome',
-      use: { 
-        ...devices['Pixel 5'],
-      },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { 
-        ...devices['iPhone 12'],
-      },
-    },
+    // {
+    //   name: 'Mobile Chrome',
+    //   use: { 
+    //     ...devices['Pixel 5'],
+    //   },
+    // },
+    // {
+    //   name: 'Mobile Safari',
+    //   use: { 
+    //     ...devices['iPhone 12'],
+    //   },
+    // },
 
     
   ],

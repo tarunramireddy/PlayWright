@@ -11,20 +11,29 @@ import { credentialsManager } from "../config/config.manager";
 export interface TestFixtures {
   loginPage: LoginPage;
   homePage: HomePage;
-
+  
   dataGenerator: typeof DataGenerator;
-
+  
+  // Dynamic user selection fixtures
+  withUser: (userType: 'superAdmin' | 'allianceAdmin' | 'leaAdmin') => {
+    email: string;
+    password: string;
+    description?: string;
+  };
+  
+  // Legacy fixture for backward compatibility  
   testUser: {
     email: string;
     password: string;
   };
-
+  
+  // Dynamic authenticated context with user selection
+  authenticatedContextWith: (userType: 'superAdmin' | 'allianceAdmin' | 'leaAdmin') => Promise<BrowserContext>;
+  
   authenticatedContext: BrowserContext;
-
+  
   authenticatedPage: Page;
-}
-
-export interface WorkerFixtures {
+}export interface WorkerFixtures {
   browserConfig: {
     headless: boolean;
     slowMo?: number;
@@ -47,6 +56,52 @@ export const test = baseTest.extend<TestFixtures, WorkerFixtures>({
 
   dataGenerator: async ({}, use) => {
     await use(DataGenerator);
+  },
+
+  withUser: async ({}, use) => {
+    const getUserData = (userType: 'superAdmin' | 'allianceAdmin' | 'leaAdmin') => {
+      const testUser = credentialsManager.getTestUser(userType);
+      return {
+        email: testUser.username,
+        password: testUser.password,
+        description: testUser.description,
+      };
+    };
+    
+    await use(getUserData);
+  },
+
+  authenticatedContextWith: async ({ browser }, use) => {
+    const createAuthenticatedContext = async (userType: 'superAdmin' | 'allianceAdmin' | 'leaAdmin') => {
+      const testUser = credentialsManager.getTestUser(userType);
+      const context = await browser.newContext({
+        viewport: { width: 1920, height: 1080 },
+      });
+
+      const page = await context.newPage();
+      const loginPage = new LoginPage(page);
+      
+      logger.step(`Setting up authenticated context for ${userType}`);
+      
+      try {
+        await loginPage.navigate();
+        await loginPage.login(testUser.username, testUser.password);
+        
+        const homePage = new HomePage(page);
+        await homePage.waitForPageLoad();
+        
+        logger.info(`Authentication successful for ${userType}: ${testUser.username}`);
+      } catch (error) {
+        logger.error(`Failed to authenticate ${userType}`, error);
+        throw error;
+      } finally {
+        await page.close();
+      }
+
+      return context;
+    };
+    
+    await use(createAuthenticatedContext);
   },
 
   testUser: async ({ dataGenerator }, use) => {
@@ -88,7 +143,7 @@ export const test = baseTest.extend<TestFixtures, WorkerFixtures>({
       await loginPage.login(testUser.email, testUser.password);
 
       const homePage = new HomePage(page);
-      await homePage.waitForPageToLoad();
+      await homePage.waitForPageLoad();
 
       logger.info("Authentication successful for test context");
     } catch (error) {
