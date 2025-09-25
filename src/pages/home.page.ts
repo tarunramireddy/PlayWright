@@ -1,6 +1,6 @@
-import { Page, Locator } from '@playwright/test';
-import { BasePage } from './base.page';
-import { logger } from '../utils/logger';
+import { Page, Locator } from "@playwright/test";
+import { BasePage } from "./base.page";
+import { logger } from "../utils/logger";
 
 export class HomePage extends BasePage {
   private readonly header: Locator;
@@ -27,7 +27,7 @@ export class HomePage extends BasePage {
   }
 
   async waitForPageToLoad(): Promise<void> {
-    logger.step('Waiting for home page to fully load');
+    logger.step("Waiting for home page to fully load");
     await this.waitForPageLoad();
     await this.waitForElement(this.header);
     await this.waitForElement(this.mainContent);

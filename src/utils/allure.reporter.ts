@@ -1,4 +1,4 @@
-import { allure } from 'allure-playwright';
+import { allure } from "allure-playwright";
 
 export class AllureReporter {
   static description(text: string): void {
@@ -9,7 +9,9 @@ export class AllureReporter {
     allure.owner(name);
   }
 
-  static severity(level: 'blocker' | 'critical' | 'normal' | 'minor' | 'trivial'): void {
+  static severity(
+    level: "blocker" | "critical" | "normal" | "minor" | "trivial"
+  ): void {
     allure.severity(level);
   }
 
@@ -39,25 +41,32 @@ export class AllureReporter {
 
   static async step<T>(name: string, body: () => T | Promise<T>): Promise<T> {
     const result = await body();
-    await allure.step(name, async () => {
-    });
+    await allure.step(name, async () => {});
     return result;
   }
 
-  static attachment(name: string, content: string | Buffer, type: string): void {
+  static attachment(
+    name: string,
+    content: string | Buffer,
+    type: string
+  ): void {
     allure.attachment(name, content, type);
   }
 
   static screenshot(name: string, screenshot: Buffer): void {
-    allure.attachment(name, screenshot, 'image/png');
+    allure.attachment(name, screenshot, "image/png");
   }
 
   static text(name: string, content: string): void {
-    allure.attachment(name, content, 'text/plain');
+    allure.attachment(name, content, "text/plain");
   }
 
   static json(name: string, content: object): void {
-    allure.attachment(name, JSON.stringify(content, null, 2), 'application/json');
+    allure.attachment(
+      name,
+      JSON.stringify(content, null, 2),
+      "application/json"
+    );
   }
 
   static parameter(name: string, value: string): void {
@@ -67,7 +76,11 @@ export class AllureReporter {
 
 export const TestDecorators = {
   feature: (featureName: string) => {
-    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    return function (
+      target: any,
+      propertyKey: string,
+      descriptor: PropertyDescriptor
+    ) {
       const originalMethod = descriptor.value;
       descriptor.value = function (...args: any[]) {
         AllureReporter.feature(featureName);
@@ -77,7 +90,11 @@ export const TestDecorators = {
   },
 
   story: (storyName: string) => {
-    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    return function (
+      target: any,
+      propertyKey: string,
+      descriptor: PropertyDescriptor
+    ) {
       const originalMethod = descriptor.value;
       descriptor.value = function (...args: any[]) {
         AllureReporter.story(storyName);
@@ -86,13 +103,19 @@ export const TestDecorators = {
     };
   },
 
-  severity: (level: 'blocker' | 'critical' | 'normal' | 'minor' | 'trivial') => {
-    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  severity: (
+    level: "blocker" | "critical" | "normal" | "minor" | "trivial"
+  ) => {
+    return function (
+      target: any,
+      propertyKey: string,
+      descriptor: PropertyDescriptor
+    ) {
       const originalMethod = descriptor.value;
       descriptor.value = function (...args: any[]) {
         AllureReporter.severity(level);
         return originalMethod.apply(this, args);
       };
     };
-  }
-};
+  },
+}; 

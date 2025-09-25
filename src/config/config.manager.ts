@@ -1,6 +1,6 @@
-import { EnvironmentConfig } from '../../configs/environment.config';
-import fs from 'fs';
-import path from 'path';
+import { EnvironmentConfig } from "../../configs/environment.config";
+import fs from "fs";
+import path from "path";
 
 export interface Credentials {
   username: string;
@@ -35,9 +35,9 @@ export interface CredentialsFile {
 }
 
 export enum Environment {
-  DEV = 'dev',
-  STAGING = 'staging',
-  PROD = 'prod'
+  DEV = "dev",
+  STAGING = "staging",
+  PROD = "prod",
 }
 
 export class CredentialsManager {
@@ -61,14 +61,14 @@ export class CredentialsManager {
     const env = process.env.ENV || process.env.NODE_ENV || Environment.DEV;
 
     switch (env.toLowerCase()) {
-      case 'development':
-      case 'dev':
+      case "development":
+      case "dev":
         return Environment.DEV;
-      case 'staging':
-      case 'stage':
+      case "staging":
+      case "stage":
         return Environment.STAGING;
-      case 'production':
-      case 'prod':
+      case "production":
+      case "prod":
         return Environment.PROD;
       default:
         console.warn(`Unknown environment: ${env}. Defaulting to development.`);
@@ -77,20 +77,24 @@ export class CredentialsManager {
   }
 
   private loadCredentials(): CredentialsFile {
-    const credentialsPath = path.resolve(__dirname, '../../credentials.json');
+    const credentialsPath = path.resolve(__dirname, "../../credentials.json");
 
     if (!fs.existsSync(credentialsPath)) {
       throw new Error(
         `Credentials file not found: ${credentialsPath}\n` +
-        `Please copy credentials.example.json to credentials.json and update with your credentials.`
+          `Please copy credentials.example.json to credentials.json and update with your credentials.`
       );
     }
 
     try {
-      const credentialsContent = fs.readFileSync(credentialsPath, 'utf-8');
+      const credentialsContent = fs.readFileSync(credentialsPath, "utf-8");
       return JSON.parse(credentialsContent);
     } catch (error) {
-      throw new Error(`Failed to load credentials file: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `Failed to load credentials file: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     }
   }
 
@@ -102,11 +106,13 @@ export class CredentialsManager {
     return this.getEnvironmentConfig().credentials;
   }
 
-  public getTestUser(userType: keyof CredentialsFile['testUsers'] = 'superAdmin'): TestUser {
+  public getTestUser(
+    userType: keyof CredentialsFile["testUsers"] = "superAdmin"
+  ): TestUser {
     return this.credentials.testUsers[userType];
   }
 
-  public getAllTestUsers(): CredentialsFile['testUsers'] {
+  public getAllTestUsers(): CredentialsFile["testUsers"] {
     return this.credentials.testUsers;
   }
 
@@ -131,10 +137,10 @@ export class CredentialsManager {
       timeout: 30000,
       retries: this.isCi() ? 2 : 0,
       headless: !this.isDebug() && this.isCi(),
-      video: this.isCi() ? 'retain-on-failure' : 'on',
-      screenshot: 'only-on-failure',
-      trace: 'retain-on-failure',
-      credentials: envConfig.credentials
+      video: this.isCi() ? "retain-on-failure" : "on",
+      screenshot: "only-on-failure",
+      trace: "retain-on-failure",
+      credentials: envConfig.credentials,
     };
 
     switch (this.currentEnvironment) {
@@ -143,9 +149,9 @@ export class CredentialsManager {
         config.retries = 0;
         config.headless = false;
         config.slowMo = 100;
-        config.video = 'on';
-        config.screenshot = 'on';
-        config.trace = 'on';
+        config.video = "on";
+        config.screenshot = "on";
+        config.trace = "on";
         break;
 
       case Environment.STAGING:
@@ -158,7 +164,7 @@ export class CredentialsManager {
         config.timeout = 30000;
         config.retries = 2;
         config.workers = 4;
-        config.video = 'off';
+        config.video = "off";
         break;
     }
 
