@@ -25,8 +25,12 @@
     "test:env:dev": "ENV=dev npx playwright test",
     "test:env:staging": "ENV=staging npx playwright test",
     "test:env:prod": "ENV=prod npx playwright test",
-    "report:html": "npx playwright show-report",
-    "report:allure": "allure serve allure-results",
+    "test:unique": "ARCHIVE_REPORTS=true npx playwright test",
+    "test:unique:headed": "ARCHIVE_REPORTS=true npx playwright test --headed",
+    "report:html": "npx playwright show-report test-results/html",
+    "report:html:latest": "npx playwright show-report $(ls -td test-results/html/* | head -n1)",
+    "report:allure": "allure serve test-results/allure",
+    "report:clean": "rm -rf test-results/html/* test-results/allure/* test-results/output/*",
     "install:browsers": "npx playwright install",
     "env:create": "cp .env.example .env && echo '.env file created! Please edit with your credentials.'"
   }

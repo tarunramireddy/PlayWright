@@ -247,11 +247,26 @@ npm run report:html
 npm run report:allure
 ```
 
+### Preserve Reports
+By default, reports are overwritten each time. To preserve multiple reports with timestamps:
+
+```bash
+# Run tests with unique report folders
+npm run test:unique
+npm run test:unique:headed
+
+# View latest timestamped report
+npm run report:html:latest
+```
+
+📖 **For detailed report preservation guide**: [PRESERVE_REPORTS.md](docs/PRESERVE_REPORTS.md)
+
 ### Reports Location
-- HTML Report: `playwright-report/index.html`
-- Allure Report: `allure-report/index.html`
-- JUnit XML: `test-results/junit.xml`
-- JSON Results: `test-results/results.json`
+
+- HTML Report: `test-results/html/index.html`
+- Allure Report: `test-results/allure/`
+- JUnit XML: `test-results/output/junit.xml`
+- JSON Results: `test-results/output/results.json`
 
 ## 📝 Writing Tests
 

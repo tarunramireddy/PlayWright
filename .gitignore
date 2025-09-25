@@ -10,14 +10,21 @@ node_modules/
 
 # Playwright test results
 /test-results/
+/test-results*/
 /playwright-report/
+/playwright-report*/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
 
 # Allure reports
 allure-results/
+allure-results*/
 allure-report/
+allure-report*/
+
+# Report archives (optional - uncomment to exclude from git)
+# reports-archive/
 
 # Build output
 dist/

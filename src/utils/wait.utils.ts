@@ -1,9 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 import { logger } from './logger';
 
-/**
- * Wait utility class for common wait operations
- */
 export class WaitUtils {
   private page: Page;
 
@@ -11,9 +8,6 @@ export class WaitUtils {
     this.page = page;
   }
 
-  /**
-   * Wait for element to be visible
-   */
   async waitForVisible(selector: string | Locator, timeout: number = 30000): Promise<void> {
     logger.step(`Waiting for element to be visible: ${selector}`);
     
@@ -24,9 +18,6 @@ export class WaitUtils {
     }
   }
 
-  /**
-   * Wait for element to be hidden
-   */
   async waitForHidden(selector: string | Locator, timeout: number = 30000): Promise<void> {
     logger.step(`Waiting for element to be hidden: ${selector}`);
     
@@ -37,9 +28,6 @@ export class WaitUtils {
     }
   }
 
-  /**
-   * Wait for element to be attached to DOM
-   */
   async waitForAttached(selector: string | Locator, timeout: number = 30000): Promise<void> {
     logger.step(`Waiting for element to be attached: ${selector}`);
     
@@ -50,9 +38,6 @@ export class WaitUtils {
     }
   }
 
-  /**
-   * Wait for text to be visible on page
-   */
   async waitForText(text: string, timeout: number = 30000): Promise<void> {
     logger.step(`Waiting for text to appear: ${text}`);
     await this.page.waitForFunction(
@@ -62,33 +47,21 @@ export class WaitUtils {
     );
   }
 
-  /**
-   * Wait for URL to contain specific text
-   */
   async waitForUrl(urlPattern: string | RegExp, timeout: number = 30000): Promise<void> {
     logger.step(`Waiting for URL to match: ${urlPattern}`);
     await this.page.waitForURL(urlPattern, { timeout });
   }
 
-  /**
-   * Wait for page to load completely
-   */
   async waitForPageLoad(timeout: number = 30000): Promise<void> {
     logger.step('Waiting for page to load completely');
     await this.page.waitForLoadState('networkidle', { timeout });
   }
 
-  /**
-   * Wait for network requests to complete
-   */
   async waitForNetworkIdle(timeout: number = 30000): Promise<void> {
     logger.step('Waiting for network to be idle');
     await this.page.waitForLoadState('networkidle', { timeout });
   }
 
-  /**
-   * Wait for custom condition
-   */
   async waitForCondition(
     condition: () => Promise<boolean> | boolean,
     options: { timeout?: number; interval?: number; timeoutMsg?: string } = {}
@@ -106,7 +79,6 @@ export class WaitUtils {
           return;
         }
       } catch (error) {
-        // Continue waiting if condition throws
       }
       
       await this.page.waitForTimeout(interval);
@@ -115,9 +87,6 @@ export class WaitUtils {
     throw new Error(timeoutMsg);
   }
 
-  /**
-   * Wait with custom timeout
-   */
   async wait(milliseconds: number): Promise<void> {
     logger.step(`Waiting for ${milliseconds}ms`);
     await this.page.waitForTimeout(milliseconds);

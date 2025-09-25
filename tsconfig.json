@@ -17,20 +17,26 @@
     "sourceMap": true,
     "baseUrl": "./",
     "paths": {
+      "@pages": ["src/pages"],
       "@pages/*": ["src/pages/*"],
+      "@utils": ["src/utils"],
       "@utils/*": ["src/utils/*"],
+      "@config": ["src/config"],
       "@config/*": ["src/config/*"],
+      "@fixtures": ["src/fixtures"],
       "@fixtures/*": ["src/fixtures/*"],
+      "@tests": ["src/tests"],
       "@tests/*": ["src/tests/*"],
+      "@data": ["src/data"],
       "@data/*": ["src/data/*"]
     },
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
   "include": [
-    "src/**/*",
-    "tests/**/*",
-    "tests-examples/**/*",
+    "src*",
+    "tests*",
+    "tests-examples*",
     "playwright.config.ts"
   ],
   "exclude": [

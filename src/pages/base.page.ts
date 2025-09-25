@@ -1,34 +1,21 @@
 import { Page, Locator, expect } from '@playwright/test';
-import { WaitUtils, logger } from '@utils/index';
-import { configManager } from '@config/config.manager';
+import { WaitUtils, logger } from '../utils/index';
+import { credentialsManager } from '../config/config.manager';
 
-/**
- * Base page class with common functionality for all page objects
- */
 export abstract class BasePage {
   protected page: Page;
   protected waitUtils: WaitUtils;
-  protected config = configManager.getConfig();
+  protected config = credentialsManager.getPlaywrightConfig();
 
   constructor(page: Page) {
     this.page = page;
     this.waitUtils = new WaitUtils(page);
   }
 
-  /**
-   * Abstract method to verify page is loaded
-   * Each page should implement this method
-   */
   abstract isLoaded(): Promise<boolean>;
 
-  /**
-   * Abstract method to get page URL pattern
-   */
   abstract getUrl(): string;
 
-  /**
-   * Navigate to page
-   */
   async navigate(url?: string): Promise<void> {
     const targetUrl = url || this.getUrl();
     logger.step(`Navigating to: ${targetUrl}`);
@@ -36,33 +23,21 @@ export abstract class BasePage {
     await this.waitForPageLoad();
   }
 
-  /**
-   * Wait for page to load completely
-   */
   async waitForPageLoad(): Promise<void> {
     logger.step('Waiting for page to load');
     await this.waitUtils.waitForPageLoad();
   }
 
-  /**
-   * Get page title
-   */
   async getTitle(): Promise<string> {
     logger.step('Getting page title');
     return await this.page.title();
   }
 
-  /**
-   * Get current URL
-   */
   async getCurrentUrl(): Promise<string> {
     logger.step('Getting current URL');
     return this.page.url();
   }
 
-  /**
-   * Take screenshot
-   */
   async takeScreenshot(name?: string): Promise<Buffer> {
     const screenshotName = name || `screenshot-${Date.now()}`;
     logger.step(`Taking screenshot: ${screenshotName}`);
@@ -72,9 +47,6 @@ export abstract class BasePage {
     });
   }
 
-  /**
-   * Click element with retry mechanism
-   */
   async click(selector: string | Locator, options?: { timeout?: number; force?: boolean }): Promise<void> {
     logger.step(`Clicking element: ${selector}`);
     
@@ -87,9 +59,6 @@ export abstract class BasePage {
     }
   }
 
-  /**
-   * Double click element
-   */
   async doubleClick(selector: string | Locator): Promise<void> {
     logger.step(`Double clicking element: ${selector}`);
     
@@ -102,9 +71,6 @@ export abstract class BasePage {
     }
   }
 
-  /**
-   * Fill input field
-   */
   async fill(selector: string | Locator, text: string, options?: { clear?: boolean }): Promise<void> {
     logger.step(`Filling input: ${selector} with: ${text}`);
     
@@ -123,9 +89,6 @@ export abstract class BasePage {
     }
   }
 
-  /**
-   * Type text with delay
-   */
   async type(selector: string | Locator, text: string, delay?: number): Promise<void> {
     logger.step(`Typing in element: ${selector} with: ${text}`);
     
@@ -138,9 +101,6 @@ export abstract class BasePage {
     }
   }
 
-  /**
-   * Select option from dropdown
-   */
   async selectOption(selector: string | Locator, option: string | { value?: string; label?: string; index?: number }): Promise<void> {
     logger.step(`Selecting option in dropdown: ${selector}`);
     
@@ -161,9 +121,6 @@ export abstract class BasePage {
     }
   }
 
-  /**
-   * Get element text
-   */
   async getText(selector: string | Locator): Promise<string> {
     logger.step(`Getting text from element: ${selector}`);
     
@@ -178,9 +135,6 @@ export abstract class BasePage {
     }
   }
 
-  /**
-   * Get element attribute
-   */
   async getAttribute(selector: string | Locator, attribute: string): Promise<string | null> {
     logger.step(`Getting attribute '${attribute}' from element: ${selector}`);
     
@@ -193,9 +147,6 @@ export abstract class BasePage {
     }
   }
 
-  /**
-   * Check if element is visible
-   */
   async isVisible(selector: string | Locator): Promise<boolean> {
     try {
       if (typeof selector === 'string') {
@@ -208,9 +159,6 @@ export abstract class BasePage {
     }
   }
 
-  /**
-   * Check if element is enabled
-   */
   async isEnabled(selector: string | Locator): Promise<boolean> {
     try {
       if (typeof selector === 'string') {
@@ -223,9 +171,6 @@ export abstract class BasePage {
     }
   }
 
-  /**
-   * Check if element is checked (for checkboxes/radio buttons)
-   */
   async isChecked(selector: string | Locator): Promise<boolean> {
     try {
       if (typeof selector === 'string') {
@@ -238,9 +183,6 @@ export abstract class BasePage {
     }
   }
 
-  /**
-   * Hover over element
-   */
   async hover(selector: string | Locator): Promise<void> {
     logger.step(`Hovering over element: ${selector}`);
     
@@ -253,9 +195,6 @@ export abstract class BasePage {
     }
   }
 
-  /**
-   * Scroll element into view
-   */
   async scrollIntoView(selector: string | Locator): Promise<void> {
     logger.step(`Scrolling element into view: ${selector}`);
     
@@ -266,24 +205,15 @@ export abstract class BasePage {
     }
   }
 
-  /**
-   * Wait for element to be visible
-   */
   async waitForElement(selector: string | Locator, timeout?: number): Promise<void> {
     await this.waitUtils.waitForVisible(selector, timeout);
   }
 
-  /**
-   * Press keyboard key
-   */
   async pressKey(key: string): Promise<void> {
     logger.step(`Pressing key: ${key}`);
     await this.page.keyboard.press(key);
   }
 
-  /**
-   * Upload file
-   */
   async uploadFile(selector: string | Locator, filePaths: string[]): Promise<void> {
     logger.step(`Uploading files: ${filePaths.join(', ')}`);
     
@@ -294,16 +224,10 @@ export abstract class BasePage {
     }
   }
 
-  /**
-   * Get all matching elements
-   */
   protected locator(selector: string): Locator {
     return this.page.locator(selector);
   }
 
-  /**
-   * Verify element is visible
-   */
   async verifyElementVisible(selector: string | Locator, timeout?: number): Promise<void> {
     logger.step(`Verifying element is visible: ${selector}`);
     
@@ -314,9 +238,6 @@ export abstract class BasePage {
     }
   }
 
-  /**
-   * Verify element contains text
-   */
   async verifyElementContainsText(selector: string | Locator, expectedText: string): Promise<void> {
     logger.step(`Verifying element contains text: ${expectedText}`);
     
@@ -327,17 +248,11 @@ export abstract class BasePage {
     }
   }
 
-  /**
-   * Verify page title
-   */
   async verifyPageTitle(expectedTitle: string | RegExp): Promise<void> {
     logger.step(`Verifying page title: ${expectedTitle}`);
     await expect(this.page).toHaveTitle(expectedTitle);
   }
 
-  /**
-   * Verify current URL
-   */
   async verifyCurrentUrl(expectedUrl: string | RegExp): Promise<void> {
     logger.step(`Verifying current URL: ${expectedUrl}`);
     await expect(this.page).toHaveURL(expectedUrl);

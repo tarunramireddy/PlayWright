@@ -1,49 +1,65 @@
-import { EnvironmentConfig, devConfig, stagingConfig, prodConfig } from '../../configs/environment.config';
-import dotenv from 'dotenv';
+import { EnvironmentConfig } from '../../configs/environment.config';
+import fs from 'fs';
 import path from 'path';
 
-/**
- * Load environment variables from .env file
- */
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+export interface Credentials {
+  username: string;
+  password: string;
+}
 
-/**
- * Available environments
- */
+export interface TestUser {
+  username: string;
+  password: string;
+  description?: string;
+}
+
+export interface EnvironmentData {
+  description: string;
+  baseUrl: string;
+  credentials: Credentials;
+}
+
+export interface CredentialsFile {
+  version: string;
+  description: string;
+  environments: {
+    dev: EnvironmentData;
+    staging: EnvironmentData;
+    prod: EnvironmentData;
+  };
+  testUsers: {
+    superAdmin: TestUser;
+    allianceAdmin: TestUser;
+    leaAdmin: TestUser;
+  };
+}
+
 export enum Environment {
   DEV = 'dev',
   STAGING = 'staging',
   PROD = 'prod'
 }
 
-/**
- * Configuration manager class
- */
-export class ConfigManager {
-  private static instance: ConfigManager;
-  private currentConfig: EnvironmentConfig;
+export class CredentialsManager {
+  private static instance: CredentialsManager;
+  private credentials: CredentialsFile;
+  private currentEnvironment: Environment;
 
   private constructor() {
-    const env = this.getEnvironment();
-    this.currentConfig = this.loadConfig(env);
+    this.currentEnvironment = this.getEnvironment();
+    this.credentials = this.loadCredentials();
   }
 
-  /**
-   * Get singleton instance of ConfigManager
-   */
-  public static getInstance(): ConfigManager {
-    if (!ConfigManager.instance) {
-      ConfigManager.instance = new ConfigManager();
+  public static getInstance(): CredentialsManager {
+    if (!CredentialsManager.instance) {
+      CredentialsManager.instance = new CredentialsManager();
     }
-    return ConfigManager.instance;
+    return CredentialsManager.instance;
   }
 
-  /**
-   * Get current environment from ENV variable or default to dev
-   */
   private getEnvironment(): Environment {
     const env = process.env.ENV || process.env.NODE_ENV || Environment.DEV;
-    
+
     switch (env.toLowerCase()) {
       case 'development':
       case 'dev':
@@ -60,66 +76,94 @@ export class ConfigManager {
     }
   }
 
-  /**
-   * Load configuration based on environment
-   */
-  private loadConfig(env: Environment): EnvironmentConfig {
-    switch (env) {
-      case Environment.DEV:
-        return devConfig;
-      case Environment.STAGING:
-        return stagingConfig;
-      case Environment.PROD:
-        return prodConfig;
-      default:
-        throw new Error(`Configuration not found for environment: ${env}`);
+  private loadCredentials(): CredentialsFile {
+    const credentialsPath = path.resolve(__dirname, '../../credentials.json');
+
+    if (!fs.existsSync(credentialsPath)) {
+      throw new Error(
+        `Credentials file not found: ${credentialsPath}\n` +
+        `Please copy credentials.example.json to credentials.json and update with your credentials.`
+      );
+    }
+
+    try {
+      const credentialsContent = fs.readFileSync(credentialsPath, 'utf-8');
+      return JSON.parse(credentialsContent);
+    } catch (error) {
+      throw new Error(`Failed to load credentials file: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
-  /**
-   * Get current configuration
-   */
-  public getConfig(): EnvironmentConfig {
-    return this.currentConfig;
+  public getEnvironmentConfig(): EnvironmentData {
+    return this.credentials.environments[this.currentEnvironment];
   }
 
-  /**
-   * Get specific configuration value
-   */
-  public get<K extends keyof EnvironmentConfig>(key: K): EnvironmentConfig[K] {
-    return this.currentConfig[key];
+  public getCredentials(): Credentials {
+    return this.getEnvironmentConfig().credentials;
   }
 
-  /**
-   * Check if running in CI environment
-   */
+  public getTestUser(userType: keyof CredentialsFile['testUsers'] = 'superAdmin'): TestUser {
+    return this.credentials.testUsers[userType];
+  }
+
+  public getAllTestUsers(): CredentialsFile['testUsers'] {
+    return this.credentials.testUsers;
+  }
+
+  public getEnvironmentName(): string {
+    return this.currentEnvironment;
+  }
+
   public isCi(): boolean {
     return !!process.env.CI;
   }
 
-  /**
-   * Check if running in debug mode
-   */
   public isDebug(): boolean {
     return !!process.env.DEBUG;
   }
 
-  /**
-   * Get environment name
-   */
-  public getEnvironmentName(): string {
-    return this.currentConfig.name;
-  }
+  public getPlaywrightConfig(): EnvironmentConfig {
+    const envConfig = this.getEnvironmentConfig();
 
-  /**
-   * Override configuration for testing purposes
-   */
-  public setConfig(config: Partial<EnvironmentConfig>): void {
-    this.currentConfig = { ...this.currentConfig, ...config };
+    const config: EnvironmentConfig = {
+      name: this.currentEnvironment,
+      baseUrl: envConfig.baseUrl,
+      timeout: 30000,
+      retries: this.isCi() ? 2 : 0,
+      headless: !this.isDebug() && this.isCi(),
+      video: this.isCi() ? 'retain-on-failure' : 'on',
+      screenshot: 'only-on-failure',
+      trace: 'retain-on-failure',
+      credentials: envConfig.credentials
+    };
+
+    switch (this.currentEnvironment) {
+      case Environment.DEV:
+        config.timeout = 10000;
+        config.retries = 0;
+        config.headless = false;
+        config.slowMo = 100;
+        config.video = 'on';
+        config.screenshot = 'on';
+        config.trace = 'on';
+        break;
+
+      case Environment.STAGING:
+        config.timeout = 20000;
+        config.retries = 1;
+        config.workers = 2;
+        break;
+
+      case Environment.PROD:
+        config.timeout = 30000;
+        config.retries = 2;
+        config.workers = 4;
+        config.video = 'off';
+        break;
+    }
+
+    return config;
   }
 }
 
-/**
- * Export singleton instance
- */
-export const configManager = ConfigManager.getInstance();
+export const credentialsManager = CredentialsManager.getInstance();
