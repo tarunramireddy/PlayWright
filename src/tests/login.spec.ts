@@ -22,8 +22,10 @@ test.describe("Login Tests", () => {
   test("should login with valid credentials", async ({
     loginPage,
     homePage,
-    testUser,
+    withUser
   }) => {
+    const userType = "allianceAdmin"
+    const user = withUser(userType);
     AllureReporter.epic("User Authentication");
     AllureReporter.feature("Login");
     AllureReporter.story("Valid Login");
@@ -46,12 +48,12 @@ test.describe("Login Tests", () => {
     });
 
     await AllureReporter.step("Login with valid credentials", async () => {
-      await loginPage.login(testUser.email, testUser.password);
+      await loginPage.login(user.email, user.password);
     });
 
     await AllureReporter.step("Verify successful login", async () => {
       await loginPage.waitForPageLoad();
-      await homePage.verifyLoginCheck("allianceAdmin");
+      await homePage.verifyLoginCheck(userType);
     });
   });
 
