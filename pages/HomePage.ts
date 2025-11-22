@@ -8,7 +8,7 @@ export class HomePage extends BasePage {
     constructor(page: Page) {
         super(page);
         this.shopByCategoryBtn = page.getByText('Shop by Category');
-        this.signInLink = page.getByRole('link', { name: 'Sign In' });
+        this.signInLink = page.getByRole('button', { name: 'Sign In' });
     }
 
     async openShopByCategory() {
